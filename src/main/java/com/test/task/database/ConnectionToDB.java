@@ -14,6 +14,8 @@ public class ConnectionToDB {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "root";
 
+    private static final String HIGH_COMMA = "\'";
+
 
     private static Connection connection;
     private static Statement statement;
@@ -50,34 +52,32 @@ public class ConnectionToDB {
             for (String s : insertBankAccount(commonList)){
                 statement.executeUpdate(s);
             }
-
             for (String s : insertGroup(commonList)){
                 statement.executeUpdate(s);
             }
 
 
+
         } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
             LoggerProvider.getLOG().error("SQLException occurred");
             return false;
         } finally {
             try {
                 connection.close();
             } catch (SQLException se) {
+                se.printStackTrace();
                 LoggerProvider.getLOG().error("SQLException occurred");
                 return false;
             }
             try {
                 statement.close();
             } catch (SQLException se) {
+                se.printStackTrace();
                 LoggerProvider.getLOG().error("SQLException occurred");
                 return false;
             }
-//            try {
-//                resultSet.close();
-//            } catch (SQLException se) {
-//                LoggerProvider.getLOG().error("SQLException occurred");
-//                return false;
-//            }
+
         }
 
         return true;
@@ -98,13 +98,13 @@ public class ConnectionToDB {
                     "                  sum_circulation_credit,\n" +
                     "                  sum_closing_balance_assets,\n" +
                     "                  sum_closing_balance_liability)" +
-                    "values (" + commonList.get(0).get(i).getId() +
-                    commonList.get(0).get(i).getNameOfClass() +
-                    commonList.get(0).get(i).getOpeningBalanceAssets() +
-                    commonList.get(0).get(i).getOpeningBalanceLiabiblity() +
-                    commonList.get(0).get(i).getCirculationDebit() +
-                    commonList.get(0).get(i).getCirculationCredit() +
-                    commonList.get(0).get(i).getClosingBalanceAssets()
+                    "values (" + commonList.get(0).get(i).getId() +"," + HIGH_COMMA+
+                    commonList.get(0).get(i).getNameOfClass()+ HIGH_COMMA +"," +
+                    commonList.get(0).get(i).getOpeningBalanceAssets()+"," +
+                    commonList.get(0).get(i).getOpeningBalanceLiabiblity()+"," +
+                    commonList.get(0).get(i).getCirculationDebit()+"," +
+                    commonList.get(0).get(i).getCirculationCredit()+"," +
+                    commonList.get(0).get(i).getClosingBalanceAssets()+","
                     +commonList.get(0).get(i).getClosingBalanceLiability() +");";
             allQueries.add(query);
 
@@ -127,14 +127,14 @@ public class ConnectionToDB {
                     "                          closing_balance_assets,\n" +
                     "                          closing_balance_liability,\n" +
                     "                          class_id)" +
-                    "values (" + commonList.get(1).get(i).getId() +
-                    commonList.get(1).get(i).getAccountNumber() +
-                    commonList.get(1).get(i).getOpeningBalanceAssets() +
-                    commonList.get(1).get(i).getOpeningBalanceLiabiblity() +
-                    commonList.get(1).get(i).getCirculationDebit() +
-                    commonList.get(1).get(i).getCirculationCredit() +
-                    commonList.get(1).get(i).getClosingBalanceAssets()
-                    +commonList.get(1).get(i).getClosingBalanceLiability()+
+                    "values (" + commonList.get(1).get(i).getId() +","+
+                    commonList.get(1).get(i).getAccountNumber()+"," +
+                    commonList.get(1).get(i).getOpeningBalanceAssets()+"," +
+                    commonList.get(1).get(i).getOpeningBalanceLiabiblity()+"," +
+                    commonList.get(1).get(i).getCirculationDebit()+"," +
+                    commonList.get(1).get(i).getCirculationCredit() +","+
+                    commonList.get(1).get(i).getClosingBalanceAssets()+","
+                    +commonList.get(1).get(i).getClosingBalanceLiability()+","+
                     commonList.get(0).get(i).getId() + ");";
             allQueries.add(query);
         }
@@ -145,29 +145,34 @@ public class ConnectionToDB {
     public static List<String>  insertGroup(List<List<Entity>> commonList){
         List<String> allQueries = new ArrayList<>();
 
-        for (int i = 0; i < commonList.get(1).size(); i++) {
+        for (int i = 0; i < commonList.get(2).size(); i++) {
 
-            String query = "insert into class (id, group_number,\n" +
-                    "                         sum_opening_balance_assets,\n" +
-                    "                         sum_opening_balance_liability,\n" +
-                    "                         sum_circulation_debit,\n" +
-                    "                         sum_circulation_credit,\n" +
-                    "                         sum_closing_balance_assets,\n" +
-                    "                         sum_closing_balance_liability,\n" +
-                    "                         class_id)" +
-                    "values (" + commonList.get(2).get(i).getId() +
-                    commonList.get(2).get(i).getAccountNumber() +
-                    commonList.get(2).get(i).getOpeningBalanceAssets() +
-                    commonList.get(2).get(i).getOpeningBalanceLiabiblity() +
-                    commonList.get(2).get(i).getCirculationDebit() +
-                    commonList.get(2).get(i).getCirculationCredit() +
-                    commonList.get(2).get(i).getClosingBalanceAssets()
-                    +commonList.get(2).get(i).getClosingBalanceLiability()+
-                    commonList.get(0).get(i).getId() + ");";
-            allQueries.add(query);
+            for(int j= 0; j < 8; j++) {
+                String query = "insert into group_table (id,group_number,\n" +
+                        "                         sum_opening_balance_assets,\n" +
+                        "                         sum_opening_balance_liability,\n" +
+                        "                         sum_circulation_debit,\n" +
+                        "                         sum_circulation_credit,\n" +
+                        "                         sum_closing_balance_assets,\n" +
+                        "                         sum_closing_balance_liability,\n" +
+                        "                         class_id)" +
+                        "values (" + commonList.get(2).get(i).getId() + ","  +
+                        commonList.get(2).get(i).getAccountNumber()  + "," +
+                        commonList.get(2).get(i).getOpeningBalanceAssets() + "," +
+                        commonList.get(2).get(i).getOpeningBalanceLiabiblity() + "," +
+                        commonList.get(2).get(i).getCirculationDebit() + "," +
+                        commonList.get(2).get(i).getCirculationCredit() + "," +
+                        commonList.get(2).get(i).getClosingBalanceAssets() + ","
+                        + commonList.get(2).get(i).getClosingBalanceLiability() + "," +
+                        commonList.get(0).get(j).getId() + ");";
+                allQueries.add(query);
+            }
+
         }
         return allQueries;
     }
+
+
 
 
 
